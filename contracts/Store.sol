@@ -149,8 +149,8 @@ contract Store is Destructible, Pausable {
         uint totalPrice = productToBuy.price.mul(quantity);
         if (msg.value >= totalPrice && productToBuy.stock >= quantity) {
             balance.add(msg.value);
-            productToBuy.stock.sub(quantity);
-            emit ProductPurchaseSuccessful(id, productToBuy.stock);
+            products[id].stock.sub(quantity);
+            emit ProductPurchaseSuccessful(id, products[id].stock);
             return true;
         }
         return false;
