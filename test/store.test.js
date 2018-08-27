@@ -3,18 +3,19 @@ var Store = artifacts.require("./Store.sol");
 contract('Store', function(accounts) {
 
   const owner = accounts[0]
+  const shopper = accounts[1]
   const storeName = 'TestStore'
-  let storeConstractInstance = null;
+  let storeConstractInstance = null
 
   before('setup contract for test', async() => {
-    storeContractInstance = await Store.new(owner, storeName);
+    storeContractInstance = await Store.new(owner, storeName)
   })
 
   it('store name should be TestStore', async() => {
     let storeName = await storeContractInstance.getStoreName.call({from: owner})
 
     assert.equal(web3.toUtf8(storeName), 'TestStore', 'Store name is not TestStore')
-  });
+  })
 
   it('should add a new product with id 1, name Carrot, price 15 and stock 10', async() => {
     await storeContractInstance.addNewProduct(1,'Carrot',15, 10, { from: owner })
@@ -40,8 +41,8 @@ contract('Store', function(accounts) {
     const ProductQuantityAdded = await storeContractInstance.ProductQuantityAdded()
 
     const log = await new Promise(function(resolve, reject) {
-        ProductQuantityAdded.watch(function(error, log){ resolve(log);});
-    });
+        ProductQuantityAdded.watch(function(error, log){ resolve(log) })
+    })
     const productStock = log.args.remainingStock.toNumber()
 
     assert.equal(productStock, 15, 'Incorrect Product stock')
@@ -52,8 +53,8 @@ contract('Store', function(accounts) {
     const ProductRemoved = await storeContractInstance.ProductRemoved()
 
     const log = await new Promise(function(resolve, reject) {
-        ProductRemoved.watch(function(error, log){ resolve(log);});
-    });
+        ProductRemoved.watch(function(error, log){ resolve(log) })
+    })
     const productStock = log.args.remainingStock.toNumber()
 
     assert.equal(productStock, 5, 'Incorrect Product stock')
@@ -64,23 +65,30 @@ contract('Store', function(accounts) {
 
     const ProductQuantityAvailable = storeContractInstance.ProductQuantityAvailable()
     const log = await new Promise(function(resolve, reject) {
-        ProductQuantityAvailable.watch(function(error, log){ resolve(log);});
-    });
+        ProductQuantityAvailable.watch(function(error, log){ resolve(log) })
+    })
     const isAvailable = log.args.available
 
     assert.equal(isAvailable, false, 'Product stock is available')
   })
 
-  it('should notify that a product stock is unavailable', async() => {
-    await storeContractInstance.checkProductAvailability(1, 10, { from: owner })
+  it('should buy 5 units of carrot and balance should be added to store', async() => {
+    const productId = 1
+    const carrotAmount = 5
+    const carrotPrice = 15
+    const totalCost = carrotAmount * carrotPrice
 
-    const ProductQuantityAvailable = storeContractInstance.ProductQuantityAvailable()
+    await storeContractInstance.buyProduct(productId, carrotAmount, { from: shopper, value: web3.toBigNumber(totalCost) })
+
+    const ProductPurchaseSuccessful = storeContractInstance.ProductPurchaseSuccessful()
     const log = await new Promise(function(resolve, reject) {
-        ProductQuantityAvailable.watch(function(error, log){ resolve(log);});
+        ProductPurchaseSuccessful.watch(function(error, log){ resolve(log) })
     });
-    const isAvailable = log.args.available
+    const remainingStock = log.args.remainingStock.toNumber()
+    const storeBalance = await storeContractInstance.getStoreBalance({from: owner})
 
-    assert.equal(isAvailable, false, 'Product stock is available')
+    assert.equal(remainingStock, 0, 'Product not bought correctly')
+    assert.equal(storeBalance.toNumber(), totalCost, 'Balance did not change')
   })
 
 });
