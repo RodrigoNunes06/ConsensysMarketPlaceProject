@@ -16,7 +16,7 @@ contract Store is Destructible, Pausable {
     /* Store properties */
     address private owner;
     bytes32 private storeName;
-    uint256 private balance;
+    uint private balance;
 
     mapping(uint => Product) private products;
     uint private productCount;
@@ -147,13 +147,11 @@ contract Store is Destructible, Pausable {
     function buyProduct(uint id, uint quantity) public payable returns (bool success) {
         Product memory productToBuy = products[id];
         uint totalPrice = productToBuy.price.mul(quantity);
-        if (msg.value >= totalPrice && productToBuy.stock >= quantity) {
-            balance.add(msg.value);
-            products[id].stock.sub(quantity);
-            emit ProductPurchaseSuccessful(id, products[id].stock);
-            return true;
-        }
-        return false;
+        require(msg.value >= totalPrice && productToBuy.stock >= quantity);
+        balance = balance.add(msg.value);
+        products[id].stock = productToBuy.stock.sub(quantity);
+        emit ProductPurchaseSuccessful(id, products[id].stock);
+        return true;
     }
 
     /**
@@ -169,7 +167,7 @@ contract Store is Destructible, Pausable {
         @notice Checks the store balance
         @return isValid
     */
-    function getStoreBalance() public onlyOwner view returns (uint256) {
+    function getStoreBalance() public onlyOwner view returns (uint) {
         return balance;
     }
 
