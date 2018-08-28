@@ -76,6 +76,7 @@ contract Store is Destructible, Pausable {
     function addNewProduct(uint id, bytes32 name, uint price, uint stock) public onlyOwner whenNotPaused returns (bool success) {
         Product memory newProduct = Product(id, name, price, stock);
         if (isProductValid(newProduct)) {
+            productCount = productCount.add(1);
             products[id] = newProduct;
             emit NewProductAdded(id);
             return true;

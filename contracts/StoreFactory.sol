@@ -21,6 +21,8 @@ contract StoreFactory is Pausable {
 
     /* Store factory events */
     event LogStoreCreated(address store, address storeOwner);
+    event LogAdminAdded(address newAdmin);
+    event LogStoreOwnerAdded(address storeOwner);
 
     /**
         @notice Default constructor
@@ -64,6 +66,7 @@ contract StoreFactory is Pausable {
     function addAdmin(address newAdmin) public onlyOwner whenNotPaused returns (bool success){
         require(admins[newAdmin] == false);
         admins[newAdmin] = true;
+        emit LogAdminAdded(newAdmin);
         return true;
     }
 
@@ -75,6 +78,7 @@ contract StoreFactory is Pausable {
     function addStoreOwner(address newStoreOwner) public onlyOwner whenNotPaused returns (bool success) {
         if (storeOwners[newStoreOwner] == false) {
             storeOwners[newStoreOwner] = true;
+            emit LogStoreOwnerAdded(newStoreOwner);
             return true;
         }
         return false;
