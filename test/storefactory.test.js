@@ -9,6 +9,7 @@ contract('StoreFactory', function(accounts) {
   const Mary = accounts[3]
   const John = accounts[4]
 
+  //Test core functionality, add a new Admin, the method getUserRole should recognize him as as an Admin
   it("should add the Mike as admin.", function() {
     return StoreFactory.deployed().then(async (instance) => {
       storeFactoryInstance = instance;
@@ -20,6 +21,7 @@ contract('StoreFactory', function(accounts) {
     });
   });
 
+  //Test core functionality, add a new store owner, the method getUserRole should recognize him as as store owner
   it('should add Peter as store owner ', function() {
     return StoreFactory.deployed().then(async (instance) => {
       storeFactoryInstance = instance;
@@ -31,6 +33,7 @@ contract('StoreFactory', function(accounts) {
     })
   })
 
+  //Test core functionality, the method getUserRole should recognize the user as Shopper, as it is not Admin, nor Store owner
   it('should recognize Mary as Shopper', function() {
     return StoreFactory.deployed().then( async (instance) => {
       storeFactoryInstance = instance;
@@ -41,6 +44,8 @@ contract('StoreFactory', function(accounts) {
     })
   })
 
+  //Test most important function, new Store creation, Store owner calls createStore function, after confirmation
+  //user calls getStores, to get his stores array in this case there will be only one.
   it('should create a new store with name TestStore' , function() {
     return StoreFactory.deployed().then(async (instance) => {
       storeFactoryInstance = instance;
@@ -54,6 +59,7 @@ contract('StoreFactory', function(accounts) {
     })
   })
 
+  //Test most important function, same user adds 3 more stores, should get 4 stores in total.
   it('Owner should see 4 stores', function() {
     return StoreFactory.deployed().then(async (instance) => {
 
@@ -67,6 +73,7 @@ contract('StoreFactory', function(accounts) {
     })
   })
 
+  //Test a Shopper sees Mikes 4 stores and John store, a total of 5 stores from 2 different owners
   it('Shopper should see Mikes 4 stores and John store, total 5 stores', function() {
     return StoreFactory.deployed().then(async (instance) => {
       await storeFactoryInstance.addStoreOwner(John, {from: admin});

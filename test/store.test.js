@@ -7,16 +7,19 @@ contract('Store', function(accounts) {
   const storeName = 'TestStore'
   let storeConstractInstance = null
 
+  //Setup the Store contract with a owner and a name
   before('setup contract for test', async() => {
     storeContractInstance = await Store.new(owner, storeName)
   })
 
+  //Checks that the name is the one given
   it('store name should be TestStore', async() => {
     let storeName = await storeContractInstance.getStoreName.call({from: owner})
 
     assert.equal(web3.toUtf8(storeName), 'TestStore', 'Store name is not TestStore')
   })
 
+  //Test Core functionality, Add a new product
   it('should add a new product with id 1, name Carrot, price 15 and stock 10', async() => {
     const id = 1
     const name = 'Carrot'
@@ -41,6 +44,7 @@ contract('Store', function(accounts) {
     assert.equal(productStock, stock, "Incorrect Product stock")
   })
 
+  //Test Core functionality add more stock to a certain product
   it('should add 5 more items to Carrot stock, carrot stock should be 15', async() => {
     const productId = 1
     const carrotsToAdd = 5
@@ -56,6 +60,7 @@ contract('Store', function(accounts) {
     assert.equal(productStock, finalCarrotsAmount, 'Incorrect Product stock')
   })
 
+  //Test Core functionality remove stock from a product
   it('should remove 10 carrot from stock, carrot stock should be 5', async() => {
     const remainingCarrots = 5
 
@@ -70,6 +75,7 @@ contract('Store', function(accounts) {
     assert.equal(productStock, remainingCarrots, 'Incorrect Product stock')
   })
 
+  //Test Check availability of a product and quantity before pruchasing it
   it('should notify that a product stock is unavailable', async() => {
     await storeContractInstance.checkProductAvailability(1, 10, { from: owner })
 
@@ -82,6 +88,7 @@ contract('Store', function(accounts) {
     assert.equal(isAvailable, false, 'Product stock is available')
   })
 
+  //Test Buy a product, it will succeed as long as there is enough stock
   it('should buy 5 units of carrot and balance should be added to store', async() => {
     const productId = 1
     const carrotAmount = 5
@@ -101,6 +108,7 @@ contract('Store', function(accounts) {
     assert.equal(storeBalance.toNumber(), totalCost, 'Balance did not change')
   })
 
+  //Test Owner withdraw amount, as long as Store has enough balance it should succeed
   it('should withdraw ether correctly', async() => {
     //Owner Balance before transaction
     const ownerBalanceBefore = web3.fromWei(web3.eth.getBalance(owner).toNumber())
