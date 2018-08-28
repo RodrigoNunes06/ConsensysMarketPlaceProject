@@ -15,3 +15,4 @@ https://github.com/OpenZeppelin/openzeppelin-solidity/blob/master/contracts/life
 6. Use fail early and fail loud pattern to reduce unnecessary code execution if an exception is thrown.
 
 7. Use OpenZeppelins-solidity Destructible contract as a Mortal design pattern in case the store owners wants to eliminate the store and get all funds.
+https://github.com/OpenZeppelin/openzeppelin-solidity/blob/master/contracts/lifecycle/Pausable.sol
