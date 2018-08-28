@@ -61,7 +61,7 @@ contract StoreFactory is Pausable {
         @param newAdmin New admin address
         @return success
     */
-    function addAdmin(address newAdmin) public onlyOwner returns (bool success){
+    function addAdmin(address newAdmin) public onlyOwner whenNotPaused returns (bool success){
         require(admins[newAdmin] == false);
         admins[newAdmin] = true;
         return true;
@@ -72,7 +72,7 @@ contract StoreFactory is Pausable {
         @param newStoreOwner New store owner address
         @return success
     */
-    function addStoreOwner(address newStoreOwner) public onlyOwner returns (bool success) {
+    function addStoreOwner(address newStoreOwner) public onlyOwner whenNotPaused returns (bool success) {
         if (storeOwners[newStoreOwner] == false) {
             storeOwners[newStoreOwner] = true;
             return true;
@@ -85,7 +85,7 @@ contract StoreFactory is Pausable {
         @param name New store name
         @return success
     */
-    function createStore(bytes32 name) public onlyStoreOwner returns (bool) {
+    function createStore(bytes32 name) public onlyStoreOwner whenNotPaused returns (bool) {
         if (name.length != 0) {
           Store store = new Store(msg.sender, name);
           stores[msg.sender].push(store);

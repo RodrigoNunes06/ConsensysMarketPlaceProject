@@ -65,7 +65,7 @@ npm install
     import with seed phrase from Ganache GUI
     1. change the network to Private Network, set Url to HTTP://127.0.0.1:7545
     2. This will set account[0].
-    3. Ganache comes with several accounts, you can add them by importing them with the private keys provided by Ganache GUI.
+    3. Ganache comes with several accounts, you can add them by importing the private keys provided by Ganache GUI.
 
 4. Compile truffle
 Compile the project from the directory where the files are located.

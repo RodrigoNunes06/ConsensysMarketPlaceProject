@@ -73,7 +73,7 @@ contract Store is Destructible, Pausable {
         @param stock Product stock
         @return success
     */
-    function addNewProduct(uint id, bytes32 name, uint price, uint stock) public onlyOwner returns (bool success) {
+    function addNewProduct(uint id, bytes32 name, uint price, uint stock) public onlyOwner whenNotPaused returns (bool success) {
         Product memory newProduct = Product(id, name, price, stock);
         if (isProductValid(newProduct)) {
             products[id] = newProduct;
@@ -89,7 +89,7 @@ contract Store is Destructible, Pausable {
         @param quantity Quantity to add
         @return success
     */
-    function addProductStock(uint id, uint quantity) public onlyOwner returns (bool success) {
+    function addProductStock(uint id, uint quantity) public onlyOwner whenNotPaused returns (bool success) {
         uint actualStock = products[id].stock;
         products[id].stock = actualStock.add(quantity);
         emit ProductQuantityAdded(id, products[id].stock);
@@ -102,7 +102,7 @@ contract Store is Destructible, Pausable {
         @param quantity Quantity to remove
         @return success
     */
-    function removeProduct(uint id, uint quantity) public onlyOwner returns (bool success){
+    function removeProduct(uint id, uint quantity) public onlyOwner whenNotPaused returns (bool success){
         Product memory productToRemove = products[id];
         uint actualStock = productToRemove.stock;
         if (productToRemove.id == id && actualStock >= quantity) {
@@ -130,7 +130,7 @@ contract Store is Destructible, Pausable {
         @param quantity Quantity to check
         @return available
     */
-    function checkProductAvailability(uint id, uint quantity) public returns(bool) {
+    function checkProductAvailability(uint id, uint quantity) public whenNotPaused returns(bool) {
         if (quantity <= products[id].stock) {
             emit ProductQuantityAvailable(id, true);
             return true;
@@ -145,7 +145,7 @@ contract Store is Destructible, Pausable {
         @param quantity Quantity to buy
         @return success
     */
-    function buyProduct(uint id, uint quantity) public payable returns (bool success) {
+    function buyProduct(uint id, uint quantity) public payable whenNotPaused returns (bool success) {
         Product memory productToBuy = products[id];
         uint totalPrice = productToBuy.price.mul(quantity);
         require(msg.value >= totalPrice && productToBuy.stock >= quantity);
