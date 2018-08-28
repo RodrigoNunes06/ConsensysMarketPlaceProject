@@ -20,7 +20,7 @@ contract StoreFactory is Pausable {
     address[] private allStores;
 
     /* Store factory events */
-    event LogStoreCreated(address indexed store, address indexed storeOwner);
+    event LogStoreCreated(address store, address storeOwner);
 
     /**
         @notice Default constructor

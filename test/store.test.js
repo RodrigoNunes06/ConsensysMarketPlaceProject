@@ -18,7 +18,12 @@ contract('Store', function(accounts) {
   })
 
   it('should add a new product with id 1, name Carrot, price 15 and stock 10', async() => {
-    await storeContractInstance.addNewProduct(1,'Carrot',15, 10, { from: owner })
+    const id = 1
+    const name = 'Carrot'
+    const price = web3.toWei(15, 'ether')
+    const stock = 10
+
+    await storeContractInstance.addNewProduct(id, name, price, stock, { from: owner })
     const NewProductAdded = await storeContractInstance.NewProductAdded()
 
     const log = await new Promise(function(resolve, reject) {
@@ -30,14 +35,17 @@ contract('Store', function(accounts) {
     const productPrice = product[1]
     const productStock = product[2]
 
-    assert.equal(productId, 1, "Incorrect Product id")
-    assert.equal(productName, 'Carrot', "Incorrect Product name")
-    assert.equal(productPrice, 15, "Incorrect Product price")
-    assert.equal(productStock, 10, "Incorrect Product stock")
+    assert.equal(productId, id, "Incorrect Product id")
+    assert.equal(productName, name, "Incorrect Product name")
+    assert.equal(productPrice, price, "Incorrect Product price")
+    assert.equal(productStock, stock, "Incorrect Product stock")
   })
 
   it('should add 5 more items to Carrot stock, carrot stock should be 15', async() => {
-    await storeContractInstance.addProductStock(1, 5, { from: owner })
+    const productId = 1
+    const carrotsToAdd = 5
+    const finalCarrotsAmount = 15
+    await storeContractInstance.addProductStock(productId, carrotsToAdd, { from: owner })
     const ProductQuantityAdded = await storeContractInstance.ProductQuantityAdded()
 
     const log = await new Promise(function(resolve, reject) {
@@ -45,10 +53,12 @@ contract('Store', function(accounts) {
     })
     const productStock = log.args.remainingStock.toNumber()
 
-    assert.equal(productStock, 15, 'Incorrect Product stock')
+    assert.equal(productStock, finalCarrotsAmount, 'Incorrect Product stock')
   })
 
   it('should remove 10 carrot from stock, carrot stock should be 5', async() => {
+    const remainingCarrots = 5
+
     await storeContractInstance.removeProduct(1, 10, { from: owner })
     const ProductRemoved = await storeContractInstance.ProductRemoved()
 
@@ -57,7 +67,7 @@ contract('Store', function(accounts) {
     })
     const productStock = log.args.remainingStock.toNumber()
 
-    assert.equal(productStock, 5, 'Incorrect Product stock')
+    assert.equal(productStock, remainingCarrots, 'Incorrect Product stock')
   })
 
   it('should notify that a product stock is unavailable', async() => {
@@ -75,7 +85,7 @@ contract('Store', function(accounts) {
   it('should buy 5 units of carrot and balance should be added to store', async() => {
     const productId = 1
     const carrotAmount = 5
-    const carrotPrice = 15
+    const carrotPrice = web3.toWei(15, 'ether')
     const totalCost = carrotAmount * carrotPrice
 
     await storeContractInstance.buyProduct(productId, carrotAmount, { from: shopper, value: web3.toBigNumber(totalCost) })
@@ -89,6 +99,33 @@ contract('Store', function(accounts) {
 
     assert.equal(remainingStock, 0, 'Product not bought correctly')
     assert.equal(storeBalance.toNumber(), totalCost, 'Balance did not change')
+  })
+
+  it('should withdraw ether correctly', async() => {
+    //Owner Balance before transaction
+    const ownerBalanceBefore = web3.fromWei(web3.eth.getBalance(owner).toNumber())
+    const amountToWithdraw = web3.toBigNumber(web3.toWei(75, 'ether'))
+    const transaction = await storeContractInstance.withdrawAmount(amountToWithdraw, {from: owner})
+
+    //Get gasCost
+    const gasUsed = web3.eth.getTransactionReceipt(transaction['tx']).gasUsed
+    const gasPrice = web3.eth.getTransaction(transaction['tx']).gasPrice
+    const gasCost = web3.fromWei((gasUsed * gasPrice))
+
+    //Event
+    const AmountWithdrawnCorrectly = storeContractInstance.AmountWithdrawnCorrectly()
+    const log = await new Promise(function(resolve, reject) {
+        AmountWithdrawnCorrectly.watch(function(error, log){ resolve(log) })
+    });
+
+    const ownerBalanceAfter = web3.fromWei(web3.eth.getBalance(owner).toNumber())
+
+    const amount = web3.fromWei(log.args.withdrawAmount.toNumber())
+
+    //fromWei method returns strings, have to append a '+' to add the values
+    const expectedBalance = +amount + +ownerBalanceBefore - +gasCost
+
+    assert.equal(expectedBalance, ownerBalanceAfter, 'Amount not withdrawn correctly')
   })
 
 });

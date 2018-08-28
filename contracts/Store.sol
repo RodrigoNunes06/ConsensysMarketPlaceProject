@@ -30,6 +30,7 @@ contract Store is Destructible, Pausable {
     event ProductPurchaseSuccessful(uint productId, uint remainingStock);
     event ProductPurchaseFailed(uint productId, uint remainingStock);
 
+    event AmountWithdrawnCorrectly(uint withdrawAmount, uint ownerBalance);
     /**
         @notice Every product has an id, a name, a price and a stock
     */
@@ -174,12 +175,14 @@ contract Store is Destructible, Pausable {
     /**
         @notice Transfer amount to owner
         @param amount Ether amount
-        @return success
+        @return owner balance
     */
-    function withdrawAmount(uint amount) public payable onlyOwner returns (bool success) {
+    function withdrawAmount(uint amount) public payable onlyOwner returns (uint) {
         require(amount <= balance);
+        balance = balance.sub(amount);
         owner.transfer(amount);
-        return true;
+        emit AmountWithdrawnCorrectly(amount, owner.balance);
+        return owner.balance;
     }
 
     // Fallback function - Called if other functions don't match call or
