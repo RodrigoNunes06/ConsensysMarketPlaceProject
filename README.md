@@ -94,8 +94,13 @@ Run the following command in the directory where you compiled the package from.
 npm run start
 ```
 
+6. Test the dapp on localhost:3000, try adding new store owners, change to the store owner account and reload the page, to see each the store owner menu, change to a random account to see the stores created.
 
 ## Tests
+
+```
+truffle test
+```
 
 ## Built With
 
