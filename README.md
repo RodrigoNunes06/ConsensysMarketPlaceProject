@@ -105,7 +105,7 @@ truffle test
 ## Built With
 
 * [Truffle Suite](https://truffleframework.com) - Truffle Suite Framework.
-* [ganache-cli](https://github.com/trufflesuite/ganache-cli) - Ganache-cli (command line)
+* [Ganache GUI](https://truffleframework.com/ganache) - Ganache GUI
 * [truffle react box](https://github.com/truffle-box/react-box) - Web app base.
 * [OpenZeppelin-Solidity](https://github.com/OpenZeppelin/openzeppelin-solidity) (Pausable.sol, Destructible.sol, SafeMath.sol)
 
